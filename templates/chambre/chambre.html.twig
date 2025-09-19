@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+  <h1>{{ title }}</h1>
+  <p>Bienvenue sur la page d'accueil.</p>
+  <p><a href="{{ path('app_chambre') }}">En savoir plus</a></p>
+{% endblock %}
