@@ -1,19 +1,202 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Welcome To Hawkins{% endblock %}
+{% block title %}Hawkins - Intro Immersive{% endblock %}
+
+{% block stylesheets %}
+<style>
+html, body {
+    margin:0; padding:0; width:100%; height:100%;
+    font-family: 'ITC Benguiat Std', serif;
+    background: url('/images/fondRouge.png') center/cover no-repeat;
+    color:white; overflow:hidden;
+}
+
+/* Fenêtre immersive */
+.intro-window {
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%, -50%);
+    background: rgba(0,0,0,0.8);
+    padding: 30px 40px;
+    border-radius: 15px;
+    max-width:800px;
+    text-align:center;
+    box-shadow: 0 0 30px black;
+    opacity:0;
+    transition: opacity 2s ease;
+}
+
+.intro-text {
+    font-size:20px;
+    line-height:1.3; /* plus serré */
+    margin-bottom:25px;
+}
+
+.intro-text p {
+    margin:5px 0; /* réduire l'espace entre paragraphes */
+}
+
+/* Logo plus grand */
+.intro-text .logo-large {
+    width:330px; /* agrandi pour bien le voir */
+    margin-bottom:10px;
+}
+
+/* Bouton Let's Go */
+#start-btn {
+    padding:12px 28px;
+    font-size:20px;
+    border:none;
+    border-radius:8px;
+    background:gold;
+    color:black;
+    cursor:pointer;
+    transition: transform 0.2s;
+}
+#start-btn:hover { transform: scale(1.05); }
+
+/* Fantômes interactifs */
+.ghost-link {
+    position:absolute;
+    cursor:pointer;
+    opacity:0;
+    transition: opacity 2s ease;
+    font-size:18px;
+}
+
+/* Exemple positions fantômes */
+#ghost-monstre { top:40%; left:10%; }
+#ghost-doc { top:60%; right:15%; }
+#ghost-lampe { top:20%; left:70%; }
+
+/* Message fantôme */
+.game-message {
+    position:fixed;
+    top:50%; left:50%;
+    transform:translate(-50%, -50%);
+    background:rgba(0,0,0,0.7);
+    padding:20px 40px;
+    border-radius:10px;
+    font-size:1.5rem;
+    opacity:0;
+    text-shadow:2px 2px 8px black;
+    transition:opacity 1s;
+    pointer-events:none;
+    z-index:1000;
+}
+
+/* Formulaire mot de passe */
+#password-form {
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%, -50%);
+    opacity:0;
+    transition: opacity 1s ease;
+}
+#password-form input {
+    padding:12px 16px; font-size:16px;
+    border-radius:8px; border:1px solid rgba(255,255,255,0.3);
+    background: rgba(0,0,0,0.5); color:white; text-align:center;
+}
+#password-form button {
+    padding:10px 20px; border:none; border-radius:5px;
+    background:gold; color:black; cursor:pointer;
+}
+</style>
+{% endblock %}
 
 {% block body %}
-   <h1>Entrer le mot de passe</h1>
+<div class="intro-window" id="intro-window">
+    <div class="intro-text">
+        <img src="/images/logo.png" alt="Logo Hawkins" class="logo-large">
+        <p>Hawkins est en danger !</p>
+        <p>Une faille vers le Monde à l’Envers s’est ouverte dans le laboratoire.</p>
+        <p>Des créatures s’échappent et des documents secrets ont été volés.</p>
+        <p>Vous, membres du groupe d’élèves courageux, devez retrouver les codes pour refermer la faille…</p>
+        <p><strong>avant que le Monde à l’Envers n’envahisse Hawkins !</strong></p>
+    </div>
+    <button id="start-btn">Let's Go !</button>
+</div>
 
-  <form method="post" action="{{ path('app_welcome') }}">
-    <label for="password">Mot de passe :</label>
-    <input id="password" name="password" type="password" required autofocus>
-    <button name="pwd: ChambreDeWill" type="submit">Valider</button>
-  </form>
+<!-- Fantômes interactifs -->
+<div id="ghost-monstre" class="ghost-link">
+    <img src="/images/monstre.webp" alt="Monstre" style="width:320px; height:auto;">
+</div>
+<div id="ghost-doc" class="ghost-link">📄</div>
+<div id="ghost-lampe" class="ghost-link">💡</div>
 
-   {% for message in app.flashes('error') %}
-    <div style="color: red;">{{ message }}</div>
-  {% endfor %}
-  
-   <p><a href="{{ path('app_gate_logout') }}">Reset</a></p>
+<!-- Formulaire mot de passe (caché) -->
+<form id="password-form" method="post" action="{{ path('app_welcome') }}" data-password="ChambreDeWill">
+    <input id="password" name="password" type="password" required placeholder="Entrer le mot de passe">
+    <button type="submit">Valider</button>
+</form>
+
+<!-- Sons -->
+<audio id="bg-music" src="/sounds/musique.mp3" loop></audio>
+<audio id="ghost-sound" src="/sounds/monster.mp3" preload="auto"></audio>
+<audio id="submit-sound" src="/sounds/correct.mp3" preload="auto"></audio>
+
+<!-- Messages -->
+<div id="game-message" class="game-message"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const introWindow = document.getElementById('intro-window');
+    const startBtn = document.getElementById('start-btn');
+    const bgMusic = document.getElementById('bg-music');
+    const ghostSound = document.getElementById('ghost-sound');
+    const submitSound = document.getElementById('submit-sound');
+    const ghosts = [document.getElementById('ghost-monstre'), document.getElementById('ghost-doc'), document.getElementById('ghost-lampe')];
+    const gameMessage = document.getElementById('game-message');
+    const passwordForm = document.getElementById('password-form');
+
+    // Lancer musique au premier clic
+    document.addEventListener('click', () => { if(bgMusic.paused) bgMusic.play(); }, { once:true });
+
+    // Apparition de la fenêtre immersive
+    setTimeout(()=> introWindow.style.opacity=1, 500);
+
+    // Fantômes invisibles au départ
+    ghosts.forEach(g => g.style.opacity = 0);
+
+    // Fonction message fantôme
+    function showMessage(text){
+        gameMessage.textContent = text;
+        gameMessage.style.opacity=1;
+        setTimeout(()=> gameMessage.style.opacity=0, 3000);
+    }
+
+    // Bouton Let's Go
+    startBtn.addEventListener('click', ()=>{
+        introWindow.style.opacity=0;
+        setTimeout(()=>{
+            passwordForm.style.display='flex';
+            setTimeout(()=> passwordForm.style.opacity=1, 500);
+            ghosts.forEach((g,i)=>{
+                setTimeout(()=> g.style.opacity=1, 500 + i*1000);
+            });
+        }, 1000);
+    });
+
+    // Clic sur fantômes pour indices
+    ghosts.forEach((g)=>{
+        g.addEventListener('click', ()=>{
+            ghostSound.currentTime=0; ghostSound.play();
+            if(g.id === 'ghost-monstre') showMessage("Regardez ce qu’il traîne derrière lui… certains détails ne sont pas visibles à première vue.");
+            if(g.id === 'ghost-doc') showMessage("Parfois, le mot clé est juste sous vos yeux, dans le code invisible");
+            if(g.id === 'ghost-lampe') showMessage("Un simple clic révèle plus qu’une illumination… regardez ce qui n’est pas affiché.");
+        });
+    });
+
+    // Son lors du clic sur Valider
+    passwordForm.addEventListener('submit', (e)=>{
+        submitSound.currentTime=0;
+        submitSound.play();
+    });
+});
+</script>
 {% endblock %}

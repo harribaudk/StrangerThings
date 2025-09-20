@@ -1,8 +1,222 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Chambre{% endblock %}
+{% block stylesheets %}
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-family: 'ITC Benguiat Std', sans-serif;
+}
+
+.chambre-page {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: url('/images/chambre.png') center/cover no-repeat;
+}
+
+.lampe, .livre, .tableau {
+    position: absolute;
+    cursor: pointer;
+}
+
+.lampe { top: 100px; left: 200px; width: 50px; }
+.livre { top: 649px; left: 600px; width: 120px; transform: translate(-50%, -50%); }
+.tableau { top: 310px; left: 850px; width: 140px; height: 90px;
+           background-color: rgba(255,255,0,0.2); box-shadow: 0 0 20px 5px yellow;
+           border: 2px solid gold; border-radius: 8px;
+           animation: pulse 2s infinite alternate; }
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 10px 2px yellow; }
+    100% { box-shadow: 0 0 30px 10px yellow; }
+}
+
+.indice-livre {
+    position: absolute;
+    top: 500px; left: 650px;
+    color: white; font-size: 18px; line-height: 1.4;
+    display: none; background-color: rgba(0,0,0,0.6);
+    padding: 15px; border-radius: 8px; max-width: 300px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    transition: opacity 2s ease;
+}
+
+.ghost-message {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    color: white; font-size: 28px; text-align: center;
+    line-height: 1.4; text-shadow: 2px 2px 5px black;
+    opacity: 0; background-color: rgba(0,0,0,0.6);
+    padding: 20px; border-radius: 10px; max-width: 400px;
+    transition: opacity 3s ease;
+}
+
+.overlay {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background-color: rgba(0,0,0,0.85);
+    display: none; justify-content: center; align-items: center;
+    flex-direction: column; z-index: 1000; color: white;
+}
+
+#letters span {
+    display:inline-block; margin:5px; padding:10px 12px;
+    border:1px solid white; cursor:pointer; font-size:24px;
+    transition: all 0.3s;
+}
+
+#letters span.highlight { color: yellow; text-shadow: 0 0 10px yellow; }
+
+#word-input {
+    font-size: 20px; padding: 8px; margin-top: 20px;
+    border-radius: 5px; border: 1px solid #fff; background-color: rgba(0,0,0,0.3);
+    color: white; text-align: center;
+}
+
+#validate-btn {
+    margin-top: 15px; padding: 10px 20px; font-size: 18px;
+    border:none; border-radius:5px; background-color: gold; cursor:pointer;
+    color: black;
+}
+</style>
+{% endblock %}
 
 {% block body %}
-  <p>Bienvenue dans la chambre de Will</p>
-  <p><a href="{{ path('app_gate_logout') }}">Reset</a></p>
+<div class="chambre-page">
+    <img src="/images/livre.png" class="livre" id="livre" alt="Livre">
+    <div class="tableau" id="tableau"></div>
+
+    <div class="indice-livre" id="indice-livre">
+        « Les lettres brillent…<br>saurez-vous les assembler pour découvrir le mot caché ? »
+    </div>
+
+    <div class="ghost-message" id="ghost-message">
+        « Vous entrez dans la chambre de Mike… le mur semble s’animer.<br>
+        Observez attentivement ! »
+    </div>
+
+    <p><a href="{{ path('app_gate_logout') }}" style="color:white;">Reset</a></p>
+</div>
+
+<div class="overlay" id="overlay">
+    <div id="letters"></div>
+    <input type="text" id="word-input" placeholder="Formez le mot">
+    <button id="validate-btn">Valider</button>
+</div>
+
+<audio id="bg-music" src="/sounds/musique.mp3" loop></audio>
+<audio id="page-turn-sound" src="/sounds/livre.mp3" preload="auto"></audio>
+<audio id="tableau-sound" src="/sounds/tableau.mp3" preload="auto"></audio>
+<audio id="correct-sound" src="/sounds/correct.mp3" preload="auto"></audio>
+<audio id="wrong-sound" src="/sounds/wrong.mp3" preload="auto"></audio>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const livre = document.getElementById('livre');
+    const indice = document.getElementById('indice-livre');
+    const ghost = document.getElementById('ghost-message');
+    const music = document.getElementById('bg-music');
+    const pageTurn = document.getElementById('page-turn-sound');
+    const tableau = document.getElementById('tableau');
+    const overlay = document.getElementById('overlay');
+    const lettersContainer = document.getElementById('letters');
+    const input = document.getElementById('word-input');
+    const validateBtn = document.getElementById('validate-btn');
+    const tableauSound = document.getElementById('tableau-sound');
+    const correctSound = document.getElementById('correct-sound');
+    const wrongSound = document.getElementById('wrong-sound');
+
+    // Musique autoplay
+    document.addEventListener('click', () => {
+        if(music.paused) music.play();
+    }, { once: true });
+
+    // Livre clic
+    livre.addEventListener('click', ()=>{
+        if(indice.style.display==='none' || !indice.style.display){
+            indice.style.display='block';
+            indice.style.opacity=0;
+            setTimeout(()=>indice.style.opacity=1,50);
+        } else {
+            indice.style.opacity=0;
+            setTimeout(()=>indice.style.display='none',600);
+        }
+        pageTurn.play();
+    });
+
+    // Message fantôme apparition
+    setTimeout(()=>ghost.style.opacity=1,100);
+    setTimeout(()=>ghost.style.opacity=0,8000);
+
+    // Alphabet sur 3 lignes
+    const letters = [
+      ['A','B','C','D','E','F','G','H','I'],
+      ['J','K','L','M','N','O','P','Q','R'],
+      ['S','T','U','V','W','X','Y','Z']
+    ];
+
+    const solution = "STRANGERTHINGS";
+
+    // Effet apparition + illumination
+    tableau.addEventListener('click', ()=>{
+        overlay.style.display='flex';
+        overlay.style.opacity=0;
+        tableauSound.play();
+
+        // Transition "fantôme"
+        setTimeout(()=>{ overlay.style.transition="opacity 2s"; overlay.style.opacity=1; },50);
+
+        // Remplir les lettres (toutes blanches d’abord)
+        lettersContainer.innerHTML='';
+        let spans = [];
+        letters.forEach(line => {
+            const lineDiv = document.createElement('div');
+            line.forEach(l=>{
+                const span = document.createElement('span');
+                span.textContent=l;
+                span.classList.add('normal'); // blanches au départ
+                span.addEventListener('click', ()=> input.value += l);
+                lineDiv.appendChild(span);
+                spans.push(span);
+            });
+            lettersContainer.appendChild(lineDiv);
+        });
+        input.value='';
+
+        // 5 sec après → illumination progressive
+        setTimeout(()=>{
+            let i=0;
+            const toHighlight = spans.filter(s => solution.includes(s.textContent));
+            const interval = setInterval(()=>{
+                if(i < toHighlight.length){
+                    toHighlight[i].classList.add('highlight');
+                    i++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 800); // chaque lettre s’illumine toutes les 0.8s
+        },5000);
+    });
+
+    // Validation mot
+   validateBtn.addEventListener('click', ()=>{
+    if(input.value.toUpperCase()===solution){
+        correctSound.play();
+        showMessage("✔ Bien joué ! Le mot secret est trouvé... La porte s'ouvre.", true);
+        setTimeout(()=> window.location.href='/salle-suivante', 4000);
+    } else {
+        wrongSound.play();
+        showMessage("❌ Ce mot n’ouvre pas la salle... Observez bien les lettres qui s’illuminent.");
+        input.value='';
+    }
+});
+
+    });
+
+</script>
 {% endblock %}

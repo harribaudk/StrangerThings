@@ -2,16 +2,101 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+        <title>{% block title %}Escape Game{% endblock %}</title>
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
+        <!-- Police Stranger Things -->
+        <style>
+            @font-face {
+                font-family: 'ITC Benguiat Std';
+                src: url('/fonts/ITC-Benguiat-Std.ttf') format('truetype');
+                font-weight: normal;
+                font-style: normal;
+            }
+
+            body, html {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+                font-family: 'ITC Benguiat Std', serif;
+                background-color: black;
+            }
+
+            /* Overlay de transition */
+            #transition-overlay {
+                position: fixed;
+                top: 0; left: 0;
+                width: 100%; height: 100%;
+                background-color: black;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 1s ease;
+                z-index: 10000;
+            }
+
+            /* Messages fantômes */
+            .ghost-message {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: white;
+                font-size: 28px;
+                text-align: center;
+                text-shadow: 2px 2px 5px black;
+                opacity: 1;
+                transition: opacity 4s ease, transform 4s ease;
+            }
+
+            /* Indices */
+            .indice-livre {
+                color: white;
+                font-size: 20px;
+                text-shadow: 0 0 8px black;
+                background-color: rgba(0,0,0,0.7);
+                padding: 10px;
+                border-radius: 5px;
+                display: none;
+                white-space: pre-line; /* pour aller à la ligne */
+            }
+
+            /* Liens reset */
+            a {
+                color: white;
+                text-decoration: none;
+            }
+        </style>
+
+        {% block stylesheets %}{% endblock %}
     </head>
     <body>
+        <!-- Overlay transition -->
+        <div id="transition-overlay"></div>
+
+        <!-- Musique de fond -->
+        <audio id="bg-music" src="/sounds/musique.mp3" loop></audio>
+
         {% block body %}{% endblock %}
+
+        {% block javascripts %}{% endblock %}
+
+        <script>
+            // Musique autoplay après clic
+            const music = document.getElementById('bg-music');
+            document.addEventListener('click', () => {
+                if (music.paused) music.play();
+            }, { once: true });
+
+            // Fonction pour gérer la transition vers une nouvelle page
+            function transitionTo(url) {
+                const overlay = document.getElementById('transition-overlay');
+                overlay.style.pointerEvents = 'auto';
+                overlay.style.opacity = 1;
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 1000); // Durée de la transition
+            }
+        </script>
     </body>
 </html>
