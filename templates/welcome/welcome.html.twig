@@ -1,9 +1,19 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil{% endblock %}
+{% block title %}Welcome To Hawkins{% endblock %}
 
 {% block body %}
-  <h1>{{ title }}</h1>
-  <p>Bienvenue sur la page d'accueil.</p>
-  <p><a href="{{ path('app_welcome') }}">En savoir plus</a></p>
+   <h1>Entrer le mot de passe</h1>
+
+  <form method="post" action="{{ path('app_welcome') }}">
+    <label for="password">Mot de passe :</label>
+    <input id="password" name="password" type="password" required autofocus>
+    <button name="pwd: ChambreDeWill" type="submit">Valider</button>
+  </form>
+
+   {% for message in app.flashes('error') %}
+    <div style="color: red;">{{ message }}</div>
+  {% endfor %}
+  
+   <p><a href="{{ path('app_gate_logout') }}">Reset</a></p>
 {% endblock %}
