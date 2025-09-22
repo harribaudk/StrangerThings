@@ -6,12 +6,6 @@
 
         <!-- Police Stranger Things -->
         <style>
-            @font-face {
-                font-family: 'font1';
-                src: url('~fonts/fontStranger.OTF') format('opentype');
-                font-weight: normal;
-                font-style: normal;
-            }
 
             body, html {
                 margin: 0;
@@ -72,7 +66,9 @@
             }
         </style>
 
-        {% block stylesheets %}{% endblock %}
+{% block stylesheets %}
+    {{ encore_entry_link_tags('app') }}
+{% endblock %}
     </head>
     <body>
         <!-- Overlay transition -->

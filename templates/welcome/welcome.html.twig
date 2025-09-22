@@ -3,13 +3,19 @@
 {% block title %}Hawkins - Intro Immersive{% endblock %}
 
 {% block stylesheets %}
+
+{{ encore_entry_link_tags('app') }}
+
 <style>
 
 html, body {
     margin:0; padding:0; width:100%; height:100%;
-    font-family: 'font1', serif;
+    font-family: 'font4', serif;
     background: url('/images/fondRouge.png') center/cover no-repeat;
     color:white; overflow:hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Fenêtre immersive */
@@ -109,6 +115,29 @@ html, body {
     padding:10px 20px; border:none; border-radius:5px;
     background:gold; color:black; cursor:pointer;
 }
+
+.text-presentation{
+
+}
+
+#bloc-presentation{
+    display: none;
+    
+    padding: 40px 50px 40px 50px;
+    border-radius: 10px;
+    opacity: 1;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 100px;
+}
+
+#bloc-presentation h1, h2, h3{
+    margin-top: 0;
+    color: black;
+    font-family: 'font1';
+    font-weight: bold;
+    opacity: 1;
+}
 </style>
 {% endblock %}
 
@@ -125,6 +154,12 @@ html, body {
     <button id="start-btn">Commencer</button>
 </div>
 
+<div id="bloc-presentation">
+    <h1 class="text-presentation">Bienvenue !</h1>
+    <h2 class="text-presentation">Nous comptons sur toi pour fermer la faille !</h2>
+    <h3 class="text-presentation">Dans un premier temps il te faudra entrez dans la chambre de Will<h3>
+</div>
+
 <!-- Fantômes interactifs -->
 <div id="ghost-monstre" class="ghost-link">
    
@@ -135,7 +170,7 @@ html, body {
 <!-- Formulaire mot de passe (caché) -->
 <form id="password-form" method="post" action="{{ path('app_welcome') }}" data-password="ChambreDeWill">
     <input id="password" name="password" type="password" required placeholder="Entrer le mot de passe">
-    <button type="submit">Valider</button>
+    <button type="submit">Chambre de Will</button>
 </form>
 
 <!-- Sons -->
@@ -156,6 +191,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const ghosts = [document.getElementById('ghost-monstre'), document.getElementById('ghost-doc'), document.getElementById('ghost-lampe')];
     const gameMessage = document.getElementById('game-message');
     const passwordForm = document.getElementById('password-form');
+    const blocPres = document.getElementById('bloc-presentation');
 
     // Lancer musique au premier clic
     document.addEventListener('click', () => { if(bgMusic.paused) bgMusic.play(); }, { once:true });
@@ -178,6 +214,7 @@ document.addEventListener('DOMContentLoaded', function(){
         introWindow.style.opacity=0;
         setTimeout(()=>{
             passwordForm.style.display='flex';
+            blocPres.style.display='flex';
             setTimeout(()=> passwordForm.style.opacity=1, 500);
             ghosts.forEach((g,i)=>{
                 setTimeout(()=> g.style.opacity=1, 500 + i*1000);
