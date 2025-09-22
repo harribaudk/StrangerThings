@@ -94,7 +94,7 @@ html, body {
     </div>
 
     <div class="ghost-message" id="ghost-message">
-        « Vous entrez dans la chambre de Mike… le mur semble s’animer.<br>
+        « Vous entrez dans la chambre de Will… le mur semble s’animer.<br>
         Observez attentivement ! »
     </div>
 
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function(){
       ['S','T','U','V','W','X','Y','Z']
     ];
 
-    const solution = "STRANGERTHINGS";
+    const solution = "WORLD";
 
     // Effet apparition + illumination
     tableau.addEventListener('click', ()=>{
@@ -205,13 +205,11 @@ document.addEventListener('DOMContentLoaded', function(){
 
     // Validation mot
    validateBtn.addEventListener('click', ()=>{
-    if(input.value.toUpperCase()===solution){
+    if(input.value.toUpperCase() === solution){
         correctSound.play();
-        showMessage("✔ Bien joué ! Le mot secret est trouvé... La porte s'ouvre.", true);
-        setTimeout(()=> window.location.href='/salle-suivante', 4000);
+        window.location.assign('/inverse');
     } else {
         wrongSound.play();
-        showMessage("❌ Ce mot n’ouvre pas la salle... Observez bien les lettres qui s’illuminent.");
         input.value='';
     }
 });

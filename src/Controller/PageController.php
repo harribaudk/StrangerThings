@@ -42,4 +42,15 @@ class PageController extends AbstractController {
         $session->remove('gate_unlocked');
         return $this->redirectToRoute('app_welcome');
     }
+
+    #[Route('/inverse', name: 'app_inverse', methods: ['GET'])]
+    public function inverse(SessionInterface $session): Response
+    {
+        if (!$session->get('gate_unlocked', false)) {
+            return $this->redirectToRoute('app_welcome');
+        }
+        return $this->render('inverse/inverse.html.twig');
+    }
+
+
 }
