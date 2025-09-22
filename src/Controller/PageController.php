@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class PageController extends AbstractController {
 
@@ -33,6 +34,7 @@ class PageController extends AbstractController {
         if (!$session->get('gate_unlocked', false)) {
             return $this->redirectToRoute('app_welcome');
         }
+        $session->invalidate();
         return $this->render('chambre/chambre.html.twig');
     }
 
@@ -46,10 +48,54 @@ class PageController extends AbstractController {
     #[Route('/inverse', name: 'app_inverse', methods: ['GET'])]
     public function inverse(SessionInterface $session): Response
     {
-        if (!$session->get('gate_unlocked', false)) {
-            return $this->redirectToRoute('app_welcome');
-        }
         return $this->render('inverse/inverse.html.twig');
+    }
+
+    #[Route('/inverse/data', name: 'app_data')]
+    public function data(): JsonResponse
+    {
+        return $this->json([
+            "project" => "Stranger Things",
+            "status" => "classified",
+            "experiments" => [
+                ["id" => 1, "subject" => "011", "result" => "success"],
+                ["id" => 2, "subject" => "008", "result" => "unknown"]
+            ],
+            "notes" => "Accès restreint au personnel autorisé uniquement.",
+            "hidden" => [
+                "encrypted" => "ZmxhZ3t1cHNpZGVfZG93bn0="
+            ]
+        ]);
+    }
+
+    #[Route('/inverse/submit', name: 'app_submit', methods: ['POST'])]
+    public function submitFlag(Request $request): Response
+    {
+        $flag = $request->request->get('flag');
+        $session = $request->getSession();
+
+        if ($flag === 'flag{upside_down}') {
+            $session->set('ctf_completed', true);
+            return $this->redirectToRoute('secret_page');
+        }
+
+        $this->addFlash('error', 'Flag incorrect, essaie encore !');
+        return $this->redirectToRoute('app_inverse');
+    }
+
+    #[Route('/secret', name: 'secret_page')]
+    public function secret(Request $request): Response
+    {
+        $session = $request->getSession();
+
+        if (!$session->get('ctf_completed', false)) {
+            return $this->redirectToRoute('app_inverse');
+        }
+        $session->invalidate();
+
+        return $this->render('secret/secret.html.twig', [
+            'message' => 'Bienvenue dans le Monde à l’Envers ! 👽'
+        ]);
     }
 
 
