@@ -1,5 +1,130 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-
+<div id="terminal" style="background:#111;color:#0f0;padding:20px;font-family:monospace;height:400px;overflow:auto; border-radius:8px; box-shadow:0 0 10px #f00;">
+  <div id="output"></div>
+  <div>
+    <span>&gt; </span><input id="input" autocomplete="off" style="background:#111;color:#0f0;border:none;outline:none;width:80%;" autofocus>
+  </div>
+</div>
+<script>
+const fs = {
+  "lab": {
+    "lab_notes.txt": "Journal du Dr. Owens : Activité étrange détectée dans le laboratoire. Code partiel : 19--.",
+    "creatures.log": "Observation : Démogorgon aperçu dans le couloir 3. Code partiel : ---5."
+  },
+  "project_mk_ultra.txt": "Dossier secret : Expériences sur le contrôle mental. Code partiel : --7-.",
+  "readme.txt": "Bienvenue sur le serveur Hawkins. Trouvez le code secret en explorant les fichiers. Commandes disponibles : ls, cd, cat, help."
+};
+let cwd = [];
+function getDir() {
+  return cwd.reduce((dir, name) => dir[name], fs);
+}
+function ls() {
+  const dir = getDir();
+  return Object.keys(dir).join('  ');
+}
+function cd(arg) {
+  if (!arg) return "Utilisation : cd <dossier>";
+  if (arg === "..") { cwd.pop(); return; }
+  const dir = getDir();
+  if (dir[arg] && typeof dir[arg] === "object") cwd.push(arg);
+  else return "Dossier introuvable";
+}
+function cat(arg) {
+  if (!arg) return "Utilisation : cat <fichier>";
+  const dir = getDir();
+  if (dir[arg] && typeof dir[arg] === "string") return dir[arg];
+  else return "Fichier introuvable";
+}
+function help() {
+  return "Commandes : ls, cd <dossier>, cat <fichier>, help, clear";
+}
+function handle(cmd) {
+  const [c, ...args] = cmd.trim().split(" ");
+  if (c === "ls") return ls();
+  if (c === "cd") return cd(args[0]) || "";
+  if (c === "cat") return cat(args[0]);
+  if (c === "help") return help();
+  if (c === "clear") {
+    output.innerHTML = "";
+    return null;
+  }
+  return "Commande inconnue";
+}
+const output = document.getElementById("output");
+const input = document.getElementById("input");
+let history = [];
+let historyIndex = -1;
+function print(text) {
+  output.innerHTML += text + "<br>";
+  output.scrollTop = output.scrollHeight;
+}
+input.addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    const cmd = input.value;
+    if (cmd.trim() !== "") {
+      history.push(cmd);
+      historyIndex = history.length;
+    }
+    print("&gt; " + cmd);
+    const res = handle(cmd);
+    if (res) print(res);
+    input.value = "";
+  } else if (e.key === "ArrowUp") {
+    if (history.length > 0 && historyIndex > 0) {
+      historyIndex--;
+      input.value = history[historyIndex];
+      setTimeout(() => input.setSelectionRange(input.value.length, input.value.length), 0);
+    }
+    e.preventDefault();
+  } else if (e.key === "ArrowDown") {
+    if (history.length > 0 && historyIndex < history.length - 1) {
+      historyIndex++;
+      input.value = history[historyIndex];
+    } else if (historyIndex === history.length - 1) {
+      historyIndex++;
+      input.value = "";
+    }
+    e.preventDefault();
+  } else if (e.key === "Tab") {
+    e.preventDefault();
+    const val = input.value;
+    const [cmd, ...args] = val.trim().split(/\s+/);
+    const commands = ["ls", "cd", "cat", "help"];
+    if (!cmd || (val.endsWith(' ') && (cmd === 'cd' || cmd === 'cat'))) {
+      // Suggest file/dir after space
+      const dir = getDir();
+      const entries = Object.keys(dir);
+      const partial = args[args.length-1] || '';
+      const matches = entries.filter(x => x.startsWith(partial));
+      if (matches.length === 1) {
+        input.value = val + matches[0].slice(partial.length);
+      } else if (matches.length > 1) {
+        print(matches.join('  '));
+      }
+    } else if (args.length === 0) {
+      // Autocomplete command
+      const matches = commands.filter(c => c.startsWith(cmd));
+      if (matches.length === 1) {
+        input.value = matches[0] + ' ';
+      } else if (matches.length > 1) {
+        print(matches.join('  '));
+      }
+    } else if (cmd === 'cd' || cmd === 'cat') {
+      // Autocomplete file/dir for cd/cat
+      const dir = getDir();
+      const entries = Object.keys(dir);
+      const partial = args[0] || '';
+      const matches = entries.filter(x => x.startsWith(partial));
+      if (matches.length === 1) {
+        input.value = cmd + ' ' + matches[0];
+      } else if (matches.length > 1) {
+        print(matches.join('  '));
+      }
+    }
+  }
+});
+print("Serveur Hawkins v1.0<br>Tapez 'help' pour la liste des commandes.");
+</script>
 {% endblock %}
