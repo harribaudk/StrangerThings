@@ -16,6 +16,9 @@
         justify-content: flex-start;
         position: relative;
     }
+    p{
+        font-family: 'font1';
+    }
     /* Overlay sombre allégé pour garder la lisibilité du texte sans masquer l'image */
     .background-overlay {
         position: fixed;
@@ -144,15 +147,16 @@
 </style>
 <div class="background-overlay"></div>
 <div class="ctf-container">
-    <h1>🔒 Hawkins Lab CTF</h1>
+    <h1>🔒 Bloqué : <br>Monde Parallèle</h1>
     <div class="hint">
-        <p>Un portail s’est ouvert… Explore les données pour trouver le flag.</p>
-        <p>Indice : regarde du côté de <code>/inverse/data</code></p>
-        <p>Utilise <span style="color:#ff6a00">atob("MonSecretEnBase64")</span> ;</p>
+        <p>Tu es dans le Monde parallèle !</p>
+        <p>Trouves le flag pour en sortir...<p>
+        <p>Indice : Regarde du côté de <code>/inverse/data</code></p>
+        <p>ps : utilise <span style="color:red"> atob("MonSecretEnBase64");</span></p>
     </div>
     <form action="{{ path('app_submit') }}" method="post">
         <input type="text" name="flag" placeholder="Entre ton flag ici" required>
-        <button type="submit">Valider</button>
+        <button type="submit">Revenir dans le Monde Normal</button>
     </form>
     {% for message in app.flashes('error') %}
         <div class="error-message">{{ message }}</div>

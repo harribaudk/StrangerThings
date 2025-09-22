@@ -63,7 +63,7 @@ class PageController extends AbstractController {
             ],
             "notes" => "Accès restreint au personnel autorisé uniquement.",
             "hidden" => [
-                "encrypted" => "ZmxhZ3t1cHNpZGVfZG93bn0="
+                "encrypted" => "ZmV0ZWZvcmFpbmU="
             ]
         ]);
     }
@@ -74,17 +74,17 @@ class PageController extends AbstractController {
         $flag = $request->request->get('flag');
         $session = $request->getSession();
 
-        if ($flag === 'flag{upside_down}') {
+        if ($flag === 'feteforaine') {
             $session->set('ctf_completed', true);
-            return $this->redirectToRoute('secret_page');
+            return $this->redirectToRoute('fete_page');
         }
 
         $this->addFlash('error', 'Flag incorrect, essaie encore !');
         return $this->redirectToRoute('app_inverse');
     }
 
-    #[Route('/secret', name: 'secret_page')]
-    public function secret(Request $request): Response
+    #[Route('/fete', name: 'fete_page')]
+    public function fete(Request $request): Response
     {
         $session = $request->getSession();
 
@@ -93,10 +93,19 @@ class PageController extends AbstractController {
         }
         $session->invalidate();
 
-        return $this->render('secret/secret.html.twig', [
+        return $this->render('fete/fete.html.twig', [
             'message' => 'Bienvenue dans le Monde à l’Envers ! 👽'
         ]);
     }
+
+    #[Route('/terminal', name: 'terminal_page')]
+    public function terminal(): Response
+    {
+
+        return $this->render('terminal/terminal.html.twig');
+    }
+
+
 
 
 }
