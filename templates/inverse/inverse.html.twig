@@ -1,7 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hawkins - Intro Immersive{% endblock %}
-
 {% block body %}
+<h1>🔒 Hawkins Lab CTF</h1>
+<p>Un portail s’est ouvert… Explore les données pour trouver le flag.</p>
+<p>Indice : regarde du côté de <code>/inverse/data</code></p>
+<p>Utilise atob("MonSecretEnBase64");</p>
 
+<form action="{{ path('app_submit') }}" method="post">
+    <input type="text" name="flag" placeholder="Entre ton flag ici" required>
+    <button type="submit">Valider</button>
+</form>
+
+{% for message in app.flashes('error') %}
+    <p style="color:red">{{ message }}</p>
+{% endfor %}
 {% endblock %}
