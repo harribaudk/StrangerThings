@@ -4,9 +4,10 @@
 
 {% block stylesheets %}
 <style>
+
 html, body {
     margin:0; padding:0; width:100%; height:100%;
-    font-family: 'ITC Benguiat Std', serif;
+    font-family: 'font1', serif;
     background: url('/images/fondRouge.png') center/cover no-repeat;
     color:white; overflow:hidden;
 }
@@ -45,13 +46,15 @@ html, body {
 /* Bouton Let's Go */
 #start-btn {
     padding:12px 28px;
-    font-size:20px;
+    font-size:25px;
     border:none;
     border-radius:8px;
     background:gold;
     color:black;
     cursor:pointer;
     transition: transform 0.2s;
+    font-family: 'font1';
+    font-weight: bold;
 }
 #start-btn:hover { transform: scale(1.05); }
 
@@ -114,12 +117,12 @@ html, body {
     <div class="intro-text">
         <img src="/images/logo.png" alt="Logo Hawkins" class="logo-large">
         <p>Hawkins est en danger !</p>
-        <p>Une faille vers le Monde à l’Envers s’est ouverte dans le laboratoire.</p>
+        <p>Une faille vers le Monde parallèle s’est ouverte dans le laboratoire.</p>
         <p>Des créatures s’échappent et des documents secrets ont été volés.</p>
         <p>Vous, membres du groupe d’élèves courageux, devez retrouver les codes pour refermer la faille…</p>
-        <p><strong>avant que le Monde à l’Envers n’envahisse Hawkins !</strong></p>
+        <p><strong>Avant que les créatures n’envahissent Hawkins !</strong></p>
     </div>
-    <button id="start-btn">Let's Go !</button>
+    <button id="start-btn">Commencer</button>
 </div>
 
 <!-- Fantômes interactifs -->
@@ -186,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function(){
     ghosts.forEach((g)=>{
         g.addEventListener('click', ()=>{
             ghostSound.currentTime=0; ghostSound.play();
-            if(g.id === 'ghost-monstre') showMessage("Regardez ce qu’il traîne derrière lui… certains détails ne sont pas visibles à première vue.");
+            if(g.id === 'ghost-monstre') showMessage("Regardez ce qu’il traîne derrière lui… certains détails ne sont pas directement visibles.");
             if(g.id === 'ghost-doc') showMessage("Parfois, le mot clé est juste sous vos yeux, dans le code invisible");
            
         });
