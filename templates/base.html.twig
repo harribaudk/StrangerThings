@@ -17,7 +17,7 @@
                 margin: 0;
                 padding: 0;
                 height: 100%;
-                width: 100%;
+                width: 100%;git bran
                 overflow: hidden;
                 font-family: 'ITC Benguiat Std', serif;
                 background-color: black;
@@ -75,19 +75,14 @@
         <div id="transition-overlay"></div>
 
         <!-- Musique de fond -->
-        <audio id="bg-music" src="/sounds/musique.mp3" loop></audio>
+        <audio id="bg-music" src="/sounds/musique.mp3" autoplay loop></audio>
 
         {% block body %}{% endblock %}
 
         {% block javascripts %}{% endblock %}
 
         <script>
-            // Musique autoplay après clic
-            const music = document.getElementById('bg-music');
-            document.addEventListener('click', () => {
-                if (music.paused) music.play();
-            }, { once: true });
-
+           
             // Fonction pour gérer la transition vers une nouvelle page
             function transitionTo(url) {
                 const overlay = document.getElementById('transition-overlay');
