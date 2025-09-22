@@ -90,9 +90,9 @@ html, body {
     display:none;
     flex-direction:column;
     align-items:center;
-    gap:10px;
+    gap:20px;
     position:absolute;
-    top:50%; left:50%;
+    top:85%; left:50%;
     transform:translate(-50%, -50%);
     opacity:0;
     transition: opacity 1s ease;
@@ -119,20 +119,20 @@ html, body {
         <p>Vous, membres du groupe d’élèves courageux, devez retrouver les codes pour refermer la faille…</p>
         <p><strong>avant que le Monde à l’Envers n’envahisse Hawkins !</strong></p>
     </div>
-    <butto id="start-btn">Let's Go !</button>
+    <button id="start-btn">Let's Go !</button>
 </div>
 
 <!-- Fantômes interactifs -->
 <div id="ghost-monstre" class="ghost-link">
-    <img src="/images/monstre.webp" alt="Monstre" style="width:320px; height:auto;">
+   
 </div>
-<div id="ghost-doc" class="ghost-link">📄</div>
-<div id="ghost-lampe" class="ghost-link">💡</div>
+<div id="ghost-doc" class="ghost-link"><img src="/images/griffure.png" style="width:120px; height:auto;"></div>
+<div id="ghost-lampe" class="ghost-link"></div>
 
 <!-- Formulaire mot de passe (caché) -->
 <form id="password-form" method="post" action="{{ path('app_welcome') }}" data-password="ChambreDeWill">
     <input id="password" name="password" type="password" required placeholder="Entrer le mot de passe">
-    <button name="pwd: ChambreDeWill" type="submit">Valider</button>
+    <button type="submit">Valider</button>
 </form>
 
 <!-- Sons -->
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function(){
             ghostSound.currentTime=0; ghostSound.play();
             if(g.id === 'ghost-monstre') showMessage("Regardez ce qu’il traîne derrière lui… certains détails ne sont pas visibles à première vue.");
             if(g.id === 'ghost-doc') showMessage("Parfois, le mot clé est juste sous vos yeux, dans le code invisible");
-            if(g.id === 'ghost-lampe') showMessage("Un simple clic révèle plus qu’une illumination… regardez ce qui n’est pas affiché.");
+           
         });
     });
 
