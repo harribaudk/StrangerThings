@@ -1,122 +1,181 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+<style>
+    body {
+        margin: 0;
+        width: 100%;
+        height: 100vh;
+        background: url('/images/fete1.png') center/cover no-repeat;
+        position: relative;
+        font-family: Arial, sans-serif;
+        color: white;
+        overflow: hidden;
+    }
 
-    {% block stylesheets %}
-    <style>
-        body {
-            margin: 0;
-            width: 100%;
-            height: 100vh;
-            background: url('/images/fete.png') center/cover no-repeat;
-            position: relative;
-            font-family: Arial, sans-serif;
-            color: white;
-            overflow: hidden;
-        }
+    .peluche {
+        position: absolute;
+        cursor: grab;
+        user-select: none;
+    }
 
-        .peluche {
-            position: absolute;
-            width: 150px;
-            height: 150px;
-            cursor: grab;
-            user-select: none;
-        }
+    #cible {
+        position: absolute;
+        top: 500px;
+        left: 300px;
+        width: 500px;
+        height: auto;
+    }
 
-        #cible {
-            position: absolute;
-            top: 400px;
-            left: 300px;
-            width: 200px; /* taille du coffre */
-            height: auto;
-        }
+    #message {
+        position: absolute;
+        top: 620px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 20px;
+    }
 
-        #message {
-            position: absolute;
-            top: 620px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 20px;
-        }
-    </style>
-    {% endblock %}
+    /* === Overlay noir transparent === */
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        font-size: 24px;
+        padding: 20px;
+        z-index: 2000;
+        opacity: 0;
+        transition: opacity 1s ease;
+        visibility: hidden;
+    }
 
+    #overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
 
-    {% block body %}
-        <!-- Peluches à déplacer -->
-        <img src="/images/peluche.png" id="peluche1" class="peluche" data-correct="false" style="top:50px; left:50px;">
-        <img src="/images/peluche2.png" id="peluche2" class="peluche" data-correct="false" style="top:50px; left:250px;">
-        <img src="/images/peluche.png" id="peluche3" class="peluche" data-correct="true" style="top:50px; left:450px;">
+    #overlay p {
+        max-width: 600px;
+        margin-bottom: 20px;
+    }
 
-        <!-- Coffre : zone de drop -->
-        <img src="/images/coffre.png" id="cible" alt="coffre">
+    /* Peluche cliquable pour valider */
+    #overlay .peluche-start {
+        width: 120px;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
 
-        <!-- Sons -->
-        <audio id="son-correct" src="/sounds/win.mp3"></audio>
-        <audio id="son-incorrect" src="/sounds/lose.mp3"></audio>
-    {% endblock %}
+    #overlay .peluche-start:hover {
+        transform: scale(1.1);
+    }
+</style>
+{% endblock %}
 
-    {% block javascripts %}
-    <script>
-        const peluches = document.querySelectorAll('.peluche');
-        const cible = document.getElementById('cible');
-        const sonCorrect = document.getElementById('son-correct');
-        const sonIncorrect = document.getElementById('son-incorrect');
+{% block body %}
+    <!-- Fenêtre d’intro -->
+    <div id="overlay">
+        <p>
+            Vous êtes arrivés à la fête foraine…<br><br>
+            Mais quelque chose cloche.<br>
+            Les lumières vacillent, le temps semble figé,<br>
+            et une étrange présence plane dans l’air…<br><br>
+            Seules certaines peluches détiennent le secret.<br>
+            Attrape-les et dépose-les sur le présentoir<br>
+            pour espérer sortir d’ici avant qu’il ne soit trop tard.<br><br>
+        </p>
+        <img src="/images/spider.png" alt="Commencer" class="peluche-start">
+    </div>
 
-        peluches.forEach(peluche => {
-            peluche.addEventListener('mousedown', (e) => {
-                let shiftX = e.clientX - peluche.getBoundingClientRect().left;
-                let shiftY = e.clientY - peluche.getBoundingClientRect().top;
+    <!-- Peluches à déplacer -->
+    <img src="/images/spider.png" id="peluche1" class="peluche" data-correct="false" style="top:130px; left:50px; width: 130px; height: 150px;">
+    <img src="/images/peluche2.png" id="peluche2" class="peluche" data-correct="true" style="top:230px; right:5px; width: 200px; height: 240px;">
+    <img src="/images/peluche.png" id="peluche3" class="peluche" data-correct="false" style="top:370px; right:340px; width: 130px; height: 130px;">
 
-                peluche.style.position = 'absolute';
-                peluche.style.zIndex = 1000;
+    <img src="/images/presentoir.png" id="cible" alt="coffre">
 
-                function moveAt(pageX, pageY) {
-                    peluche.style.left = pageX - shiftX + 'px';
-                    peluche.style.top = pageY - shiftY + 'px';
-                }
+    <audio id="son-correct" src="/sounds/win.mp3"></audio>
+    <audio id="son-incorrect" src="/sounds/lose.mp3"></audio>
+{% endblock %}
 
-                moveAt(e.pageX, e.pageY);
+{% block javascripts %}
+<script>
+    // === Overlay apparition ===
+    window.addEventListener('load', () => {
+        const overlay = document.getElementById('overlay');
+        const startPeluche = document.querySelector('.peluche-start');
+        overlay.classList.add('show');
 
-                function onMouseMove(e) {
-                    moveAt(e.pageX, e.pageY);
-                }
-
-                document.addEventListener('mousemove', onMouseMove);
-
-                peluche.onmouseup = function() {
-                    document.removeEventListener('mousemove', onMouseMove);
-                    peluche.onmouseup = null;
-
-                    // Vérification collision avec le coffre
-                    const pelucheRect = peluche.getBoundingClientRect();
-                    const cibleRect = cible.getBoundingClientRect();
-
-                    const overlap = !(pelucheRect.right < cibleRect.left || 
-                                      pelucheRect.left > cibleRect.right || 
-                                      pelucheRect.bottom < cibleRect.top || 
-                                      pelucheRect.top > cibleRect.bottom);
-
-                    if (overlap) {
-                        if (peluche.dataset.correct === "true") {
-                            sonCorrect.play();
-
-                            // Centrer la peluche sur le coffre
-                            peluche.style.left = (cibleRect.left + window.scrollX + (cibleRect.width - pelucheRect.width)/2) + 'px';
-                            peluche.style.top = (cibleRect.top + window.scrollY + (cibleRect.height - pelucheRect.height)/2) + 'px';
-
-                            // Changement de salle après 1 seconde
-                            setTimeout(() => {
-                                 window.location.assign('/inverse')
-                            }, 1000);
-                        } else {
-                            sonIncorrect.play();
-                        }
-                    }
-                };
-            });
-
-            peluche.ondragstart = () => false; // désactive drag HTML
+        // Disparition quand on clique sur la peluche
+        startPeluche.addEventListener('click', () => {
+            overlay.classList.remove('show');
         });
-    </script>
-    {% endblock %}
+    });
 
+    const peluches = document.querySelectorAll('.peluche');
+    const cible = document.getElementById('cible');
+    const sonCorrect = document.getElementById('son-correct');
+    const sonIncorrect = document.getElementById('son-incorrect');
+
+    peluches.forEach(peluche => {
+        peluche.addEventListener('mousedown', (e) => {
+            let shiftX = e.clientX - peluche.getBoundingClientRect().left;
+            let shiftY = e.clientY - peluche.getBoundingClientRect().top;
+
+            peluche.style.position = 'absolute';
+            peluche.style.zIndex = 1000;
+
+            function moveAt(pageX, pageY) {
+                peluche.style.left = pageX - shiftX + 'px';
+                peluche.style.top = pageY - shiftY + 'px';
+            }
+
+            moveAt(e.pageX, e.pageY);
+
+            function onMouseMove(e) {
+                moveAt(e.pageX, e.pageY);
+            }
+
+            document.addEventListener('mousemove', onMouseMove);
+
+            peluche.onmouseup = function() {
+                document.removeEventListener('mousemove', onMouseMove);
+                peluche.onmouseup = null;
+
+                const pelucheRect = peluche.getBoundingClientRect();
+                const cibleRect = cible.getBoundingClientRect();
+
+                const overlap = !(pelucheRect.right < cibleRect.left || 
+                                  pelucheRect.left > cibleRect.right || 
+                                  pelucheRect.bottom < cibleRect.top || 
+                                  pelucheRect.top > cibleRect.bottom);
+
+                if (overlap) {
+                    if (peluche.dataset.correct === "true") {
+                        sonCorrect.play();
+
+                        peluche.style.left = (cibleRect.left + window.scrollX + (cibleRect.width - pelucheRect.width)/2) + 'px';
+                        peluche.style.top = (cibleRect.top + window.scrollY + (cibleRect.height - pelucheRect.height)/2) + 'px';
+
+                        setTimeout(() => {
+                             window.location.assign('/laboratoire')
+                        }, 1000);
+                    } else {
+                        sonIncorrect.play();
+                    }
+                }
+            };
+        });
+
+        peluche.ondragstart = () => false;
+    });
+</script>
+{% endblock %}

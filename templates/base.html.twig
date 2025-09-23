@@ -76,17 +76,19 @@
 
         {% block javascripts %}{% endblock %}
 
-        <script>
-           
-            // Fonction pour gérer la transition vers une nouvelle page
-            function transitionTo(url) {
-                const overlay = document.getElementById('transition-overlay');
-                overlay.style.pointerEvents = 'auto';
-                overlay.style.opacity = 1;
-                setTimeout(() => {
-                    window.location.href = url;
-                }, 1000); // Durée de la transition
-            }
-        </script>
+       <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const bgMusic = document.getElementById("bg-music");
+
+        // Dès le premier clic de l’utilisateur → lancer la musique
+        function startMusic() {
+            bgMusic.play().catch(err => console.log("Lecture bloquée :", err));
+            document.removeEventListener("click", startMusic);
+        }
+
+        document.addEventListener("click", startMusic);
+    });
+</script>
+
     </body>
 </html>

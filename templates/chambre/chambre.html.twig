@@ -25,10 +25,19 @@ html, body {
 
 .lampe { top: 100px; left: 200px; width: 50px; }
 .livre { top: 649px; left: 600px; width: 120px; transform: translate(-50%, -50%); }
-.tableau { top: 304px; left: 889px; width: 148px; height: 90px;
-           background-color: rgba(255,255,0,0.2); box-shadow: 0 0 20px 5px yellow;
-           border: 2px solid gold; border-radius: 8px;
-           animation: pulse 2s infinite alternate; }
+.tableau {
+    position: absolute;
+    top: 39.1%;   /* 304 / 1080 * 100 */
+    left: 64.3%;  /* 889 / 1920 * 100 */
+    width: 11.1%;  /* 148 / 1920 * 100 */
+    height: 11.9%; /* 90 / 1080 * 100 */
+    background-color: rgba(255,255,0,0.2);
+    box-shadow: 0 0 20px 5px yellow;
+    border: 2px solid gold;
+    border-radius: 8px;
+    animation: pulse 2s infinite alternate;
+}
+
 
 @keyframes pulse {
     0% { box-shadow: 0 0 10px 2px yellow; }
@@ -47,6 +56,28 @@ html, body {
     transition: opacity 2s ease;
 }
 
+
+/* === Overlay noir transparent === */
+#overlay-intro {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    font-size: 24px;
+    padding: 20px;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 1s ease;
+    visibility: hidden;
+
 .ghost-message {
     text-align: center;
     font-family: fantasy;
@@ -56,7 +87,41 @@ html, body {
     line-height: 1.4; text-shadow: 2px 2px 5px black;
     opacity: 0; background-color: rgba(0,0,0,0.6);
     padding: 20px; border-radius: 10px; max-width: 400px;
-    transition: opacity 3s ease;
+    transition: opacity 3s ease
+}
+#overlay-intro.show {
+    opacity: 1;
+    visibility: visible;
+}
+#overlay-intro p {
+    max-width: 600px;
+    margin-bottom: 20px;
+}
+#overlay-intro .peluche-start {
+    width: 120px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+#overlay-intro .peluche-start:hover {
+    transform: scale(1.1);
+}
+
+/* Alphabet et input */
+#letters span {
+    display:inline-block; margin:5px; padding:10px 12px;
+    border:1px solid white; cursor:pointer; font-size:24px;
+    transition: all 0.3s;
+}
+#letters span.highlight { color: yellow; text-shadow: 0 0 10px yellow; }
+#word-input {
+    font-size: 20px; padding: 8px; margin-top: 20px;
+    border-radius: 5px; border: 1px solid #fff; background-color: rgba(0,0,0,0.3);
+    color: white; text-align: center;
+}
+#validate-btn {
+    margin-top: 15px; padding: 10px 20px; font-size: 18px;
+    border:none; border-radius:5px; background-color: gold; cursor:pointer;
+    color: black;
 }
 
 .overlay {
@@ -64,26 +129,6 @@ html, body {
     background-color: rgba(0,0,0,0.85);
     display: none; justify-content: center; align-items: center;
     flex-direction: column; z-index: 1000; color: white;
-}
-
-#letters span {
-    display:inline-block; margin:5px; padding:10px 12px;
-    border:1px solid white; cursor:pointer; font-size:24px;
-    transition: all 0.3s;
-}
-
-#letters span.highlight { color: yellow; text-shadow: 0 0 10px yellow; }
-
-#word-input {
-    font-size: 20px; padding: 8px; margin-top: 20px;
-    border-radius: 5px; border: 1px solid #fff; background-color: rgba(0,0,0,0.3);
-    color: white; text-align: center;
-}
-
-#validate-btn {
-    margin-top: 15px; padding: 10px 20px; font-size: 18px;
-    border:none; border-radius:5px; background-color: gold; cursor:pointer;
-    color: black;
 }
 </style>
 {% endblock %}
@@ -96,11 +141,18 @@ html, body {
     <div class="indice-livre" id="indice-livre">
         « Les lettres brillent…<br>Saurez-vous les assembler pour découvrir le mot caché ? »
     </div>
+</div>
 
-    <div class="ghost-message" id="ghost-message">
-        « Vous entrez dans la chambre de Will… <br>Le mur semble s’animer.<br>
-        Observez attentivement ! »
-    </div>
+<!-- === Fenêtre d’intro === -->
+<div id="overlay-intro">
+    <p>
+        Vous êtes dans la chambre de Will...<br><br>
+        Les murs tremblent, les lumières clignotent.<br>
+        Quelque chose cherche à communiquer à travers ce tableau.<br><br>
+        
+    </p>
+    <img src="/images/des.png" alt="Commencer" class="peluche-start" style="width:60px; height:60px;">
+
 </div>
 
 <div class="overlay" id="overlay">
@@ -115,7 +167,6 @@ html, body {
 <audio id="correct-sound" src="/sounds/correct.mp3" preload="auto"></audio>
 <audio id="wrong-sound" src="/sounds/wrong.mp3" preload="auto"></audio>
 <audio id="door-sound" src="/sounds/door.mp3" preload="auto"></audio>
-
 {% endblock %}
 
 {% block javascripts %}
@@ -123,7 +174,6 @@ html, body {
 document.addEventListener('DOMContentLoaded', function(){
     const livre = document.getElementById('livre');
     const indice = document.getElementById('indice-livre');
-    const ghost = document.getElementById('ghost-message');
     const music = document.getElementById('bg-music');
     const pageTurn = document.getElementById('page-turn-sound');
     const tableau = document.getElementById('tableau');
@@ -134,8 +184,18 @@ document.addEventListener('DOMContentLoaded', function(){
     const tableauSound = document.getElementById('tableau-sound');
     const correctSound = document.getElementById('correct-sound');
     const wrongSound = document.getElementById('wrong-sound');
+    const introOverlay = document.getElementById('overlay-intro');
+    const startPeluche = document.querySelector('.peluche-start');
+    const doorSound = document.getElementById('door-sound');
 
-    // Musique autoplay
+    // === Intro overlay ===
+    setTimeout(()=> introOverlay.classList.add('show'), 300);
+    startPeluche.addEventListener('click', ()=>{
+        introOverlay.classList.remove('show');
+        doorSound.play().catch(e => console.log("Impossible de jouer le son :", e));
+    });
+
+    // Musique autoplay au premier clic
     document.addEventListener('click', () => {
         if(music.paused) music.play();
     }, { once: true });
@@ -153,24 +213,12 @@ document.addEventListener('DOMContentLoaded', function(){
         pageTurn.play();
     });
 
-    // Message fantôme apparition
-    setTimeout(()=>ghost.style.opacity=1,100);
-    setTimeout(()=>ghost.style.opacity=0,8000);
-
-    const doorSound = document.getElementById('door-sound');
-setTimeout(()=>{
-    ghost.style.opacity=1;
-    doorSound.play().catch(e => console.log("Impossible de jouer le son :", e));
-},100);
-
-
     // Alphabet sur 3 lignes
     const letters = [
       ['A','B','C','D','E','F','G','H','I'],
       ['J','K','L','M','N','O','P','Q','R'],
       ['S','T','U','V','W','X','Y','Z']
     ];
-
     const solution = "WORLD";
 
     // Effet apparition + illumination
@@ -179,10 +227,9 @@ setTimeout(()=>{
         overlay.style.opacity=0;
         tableauSound.play();
 
-        // Transition "fantôme"
         setTimeout(()=>{ overlay.style.transition="opacity 2s"; overlay.style.opacity=1; },50);
 
-        // Remplir les lettres (toutes blanches d’abord)
+        // Remplir les lettres
         lettersContainer.innerHTML='';
         let spans = [];
         letters.forEach(line => {
@@ -190,7 +237,6 @@ setTimeout(()=>{
             line.forEach(l=>{
                 const span = document.createElement('span');
                 span.textContent=l;
-                span.classList.add('normal'); // blanches au départ
                 span.addEventListener('click', ()=> input.value += l);
                 lineDiv.appendChild(span);
                 spans.push(span);
@@ -199,7 +245,7 @@ setTimeout(()=>{
         });
         input.value='';
 
-        // 5 sec après → illumination progressive
+        // Illumination progressive
         setTimeout(()=>{
             let i=0;
             const toHighlight = spans.filter(s => solution.includes(s.textContent));
@@ -210,22 +256,20 @@ setTimeout(()=>{
                 } else {
                     clearInterval(interval);
                 }
-            }, 800); // chaque lettre s’illumine toutes les 0.8s
+            }, 800);
         },4000);
     });
 
     // Validation mot
-   validateBtn.addEventListener('click', ()=>{
-    if(input.value.toUpperCase() === solution){
-        correctSound.play();
-        window.location.assign('/inverse');
-    } else {
-        wrongSound.play();
-        input.value='';
-    }
-});
-
+    validateBtn.addEventListener('click', ()=>{
+        if(input.value.toUpperCase() === solution){
+            correctSound.play();
+            window.location.assign('/inverse');
+        } else {
+            wrongSound.play();
+            input.value='';
+        }
     });
-
+});
 </script>
 {% endblock %}
