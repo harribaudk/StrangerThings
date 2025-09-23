@@ -23,18 +23,20 @@
     z-index: 10;
 }
 
-/* Bouton invisible en haut */
-.invisible-btn-top {
+/* Bouton invisible au centre */
+.invisible-btn-center {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 25vh;
+    top: 50%;                /* placé au milieu verticalement */
+    left: 50%;               /* placé au milieu horizontalement */
+    transform: translate(-50%, -50%); /* recentre parfaitement */
+    width: 40vw;             /* largeur couvrant 40% de l’écran */
+    height: 30vh;            /* hauteur couvrant 30% de l’écran */
     background: transparent;
     border: none;
     cursor: pointer;
     z-index: 10;
 }
+
 
 /* Bouton invisible à gauche */
 .invisible-btn-left {
@@ -55,7 +57,7 @@
     <button class="invisible-btn-right" onclick="window.location.href='/terminal'" aria-label="Zone terminal droite"></button>
 
     <!-- Haut -->
-    <button class="invisible-btn-top" onclick="window.location.href='/final'" aria-label="Zone terminal haut"></button>
+    <button class="invisible-btn-center" onclick="window.location.href='/final'" aria-label="Zone terminal haut"></button>
 
     <!-- Gauche -->
     <button class="invisible-btn-left" onclick="window.location.href='/ordinateur'" aria-label="Zone terminal gauche"></button>
