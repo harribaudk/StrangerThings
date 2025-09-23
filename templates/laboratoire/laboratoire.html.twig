@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<style>
+.laboratoire-bg {
+    min-height: 100vh;
+    width: 100vw;
+    background: url('/images/Laboratoire.png') center center no-repeat;
+    background-size: cover;
+    position: relative;
+}
+.invisible-btn {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    width: 25vw;
+    height: 100vh;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+}
+</style>
+<div class="laboratoire-bg">
+    <button class="invisible-btn" onclick="window.location.href='/terminal'" aria-label="Zone terminal"></button>
+</div>
+{% endblock %}
