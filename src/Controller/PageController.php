@@ -109,6 +109,12 @@ class PageController extends AbstractController {
         return $this->render('laboratoire/laboratoire.html.twig');
     }
 
+    #[Route('/final', name: 'app_final', methods: ['GET'])]
+    public function final(): Response
+    {
+        return $this->render('final/final.html.twig');
+    }
+
 
 
 
