@@ -25,19 +25,10 @@ html, body {
 
 .lampe { top: 100px; left: 200px; width: 50px; }
 .livre { top: 649px; left: 600px; width: 120px; transform: translate(-50%, -50%); }
-.tableau {
-    position: absolute;
-    top: 39.1%;   /* 304 / 1080 * 100 */
-    left: 64.3%;  /* 889 / 1920 * 100 */
-    width: 11.1%;  /* 148 / 1920 * 100 */
-    height: 11.9%; /* 90 / 1080 * 100 */
-    background-color: rgba(255,255,0,0.2);
-    box-shadow: 0 0 20px 5px yellow;
-    border: 2px solid gold;
-    border-radius: 8px;
-    animation: pulse 2s infinite alternate;
-}
-
+.tableau { top: 304px; left: 889px; width: 148px; height: 90px;
+           background-color: rgba(255,255,0,0.2); box-shadow: 0 0 20px 5px yellow;
+           border: 2px solid gold; border-radius: 8px;
+           animation: pulse 2s infinite alternate; }
 
 @keyframes pulse {
     0% { box-shadow: 0 0 10px 2px yellow; }
@@ -46,8 +37,6 @@ html, body {
 
 .indice-livre {
     position: absolute;
-    text-align: center;
-    font-family: fantasy;
     top: 500px; left: 650px;
     color: white; font-size: 18px; line-height: 1.4;
     display: none; background-color: rgba(0,0,0,0.6);
@@ -55,7 +44,6 @@ html, body {
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
     transition: opacity 2s ease;
 }
-
 
 /* === Overlay noir transparent === */
 #overlay-intro {
@@ -77,17 +65,6 @@ html, body {
     opacity: 0;
     transition: opacity 1s ease;
     visibility: hidden;
-
-.ghost-message {
-    text-align: center;
-    font-family: fantasy;
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    color: white; font-size: 28px; text-align: center;
-    line-height: 1.4; text-shadow: 2px 2px 5px black;
-    opacity: 0; background-color: rgba(0,0,0,0.6);
-    padding: 20px; border-radius: 10px; max-width: 400px;
-    transition: opacity 3s ease
 }
 #overlay-intro.show {
     opacity: 1;
@@ -149,9 +126,9 @@ html, body {
         Vous êtes dans la chambre de Will...<br><br>
         Les murs tremblent, les lumières clignotent.<br>
         Quelque chose cherche à communiquer à travers ce tableau.<br><br>
-        
+        Cliquez sur la peluche pour continuer...
     </p>
-    <img src="/images/des.png" alt="Commencer" class="peluche-start" style="width:60px; height:60px;">
+    <img src="/images/des.png" alt="Commencer" class="peluche-start" style="width:50px; height:auto;">
 
 </div>
 
