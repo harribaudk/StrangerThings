@@ -1,5 +1,196 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
+{% block stylesheets %}
+<style>
+html, body {
+    margin:0; padding:0;
+    background:black;
+    height:100%; width:100%;
+    font-family:'Courier New', monospace;
+    overflow:hidden;
+    color:#0f0;
+}
 
+/* Animation intro typewriter */
+@keyframes typewriter {
+  from { width: 0 }
+  to { width: 100% }
+}
+@keyframes blink {
+  50% { border-color: transparent }
+}
+#intro {
+  color:red;
+  font-size:22px;
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 3px solid red;
+  width:0;
+  animation: typewriter 3s steps(40,end) 1s 1 normal both,
+             blink 0.75s step-end infinite;
+  margin:20px;
+}
+
+/* Terminal */
+.terminal {
+    background:rgba(0,0,0,0.9);
+    border:2px solid #0f0;
+    width:80%; max-width:900px; height:60vh;
+    padding:20px;
+    overflow-y:auto;
+    box-shadow:0 0 30px #0f0;
+    text-align:left;
+    position:relative;
+    margin: auto;
+}
+#console-text { white-space:pre-line; font-size:16px; line-height:1.4; }
+
+/* Timer visuel */
+#timer {
+    font-size:40px;
+    font-weight:bold;
+    margin-top:15px;
+    color:red;
+    text-shadow:0 0 10px red, 0 0 20px red;
+    text-align:center;
+}
+
+/* Input */
+#password-input {
+    margin-top:20px;
+    background:black;
+    border:none;
+    border-bottom:2px solid #0f0;
+    color:#0f0;
+    font-size:20px;
+    width:200px;
+    outline:none;
+    text-align:center;
+}
+#submit-btn {
+    background:#0f0;
+    color:black;
+    font-weight:bold;
+    padding:8px 20px;
+    border:none;
+    cursor:pointer;
+    margin-left:10px;
+}
+#submit-btn:hover { background:black; color:#0f0; border:1px solid #0f0; }
+
+/* Effets spéciaux */
+.shake { animation: shake 0.5s; }
+@keyframes shake {
+    0% { transform:translate(2px,2px); }
+    25% { transform:translate(-2px,2px); }
+    50% { transform:translate(2px,-2px); }
+    75% { transform:translate(-2px,-2px); }
+    100% { transform:translate(0,0); }
+}
+.flash { animation: flash 0.3s; }
+@keyframes flash {
+    from { background:red; }
+    to { background:black; }
+}
+.glitch {
+    font-size:30px;
+    font-weight:bold;
+    color:lime;
+    animation:glitch 1s infinite;
+    margin-top:20px;
+    text-align:center;
+}
+@keyframes glitch {
+    0% { text-shadow:2px 0 red, -2px 0 blue; }
+    20% { text-shadow:-2px 0 lime, 2px 0 cyan; }
+    40% { text-shadow:2px 2px red, -2px -2px blue; }
+    60% { text-shadow:-2px 2px lime, 2px -2px cyan; }
+    80% { text-shadow:0 0 8px lime; }
+    100% { text-shadow:0 0 15px #0f0; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div id="intro">> Connexion au système Hawkins Lab…</div>
+
+<div class="terminal" id="terminal">
+    <div id="console-text">> Entrez le mot de passe final :</div>
+    <input type="password" id="password-input" placeholder="Mot de passe">
+    <button id="submit-btn">Valider</button>
+    <div id="timer">60</div>
+    <div id="result"></div>
+</div>
+
+<!-- Sons -->
+<audio id="alarm" src="/sounds/alarm.mp3"></audio>
+<audio id="monster" src="/sounds/monster.mp3"></audio>
+<audio id="glitch-sound" src="/sounds/glitch.mp3"></audio>
+<audio id="access" src="/sounds/correct.mp3"></audio>
+<audio id="heartbeat" src="/sounds/heartbeat.mp3" loop></audio>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener("DOMContentLoaded", ()=>{
+    const timerEl = document.getElementById("timer");
+    const result = document.getElementById("result");
+    const terminal = document.getElementById("terminal");
+    const consoleText = document.getElementById("console-text");
+
+    const alarm = document.getElementById("alarm");
+    const monster = document.getElementById("monster");
+    const glitchSound = document.getElementById("glitch-sound");
+    const access = document.getElementById("access");
+    const heartbeat = document.getElementById("heartbeat");
+
+    heartbeat.volume = 0.4;
+    heartbeat.play();
+
+    let timeLeft = 60;
+    let countdown = setInterval(()=>{
+        timeLeft--;
+        timerEl.textContent = timeLeft;
+
+        // événements de pression
+        if(timeLeft % 15 === 0){
+            alarm.play();
+            terminal.classList.add("shake");
+            document.body.classList.add("flash");
+            setTimeout(()=>{
+                terminal.classList.remove("shake");
+                document.body.classList.remove("flash");
+            },600);
+            consoleText.innerHTML += "<br>▒▒▒ SYSTEM ERROR ▒▒▒";
+        }
+
+        if(timeLeft <= 0){
+            clearInterval(countdown);
+            monster.play();
+            document.body.style.background="red";
+            result.innerHTML = "<div class='glitch'>💀 ECHEC : Le portail s’ouvre…</div>";
+        }
+    },1000);
+
+    const solution = "ONZE1975";
+
+    function checkPassword(){
+        if(document.getElementById("password-input").value.toUpperCase() === solution){
+            clearInterval(countdown);
+            heartbeat.pause();
+            glitchSound.play();
+            setTimeout(()=>{
+                access.play();
+                result.innerHTML = "<div class='glitch'>✅ ACCESS GRANTED<br> Portail refermé.</div>";
+                document.body.style.background="black";
+            },1500);
+        } else {
+            alarm.play();
+            result.innerHTML = "<div style='color:red'>⛔ Mauvais mot de passe</div>";
+        }
+    }
+
+    document.getElementById("submit-btn").addEventListener("click", checkPassword);
+});
+</script>
 {% endblock %}
