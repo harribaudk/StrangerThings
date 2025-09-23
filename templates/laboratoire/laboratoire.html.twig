@@ -5,14 +5,42 @@
 .laboratoire-bg {
     min-height: 100vh;
     width: 100vw;
-    background: url('/images/Laboratoire.png') center center no-repeat;
+    background: url('/images/Laboratoire1.png') center center no-repeat;
     background-size: cover;
     position: relative;
 }
-.invisible-btn {
+
+/* Bouton invisible à droite */
+.invisible-btn-right {
     position: fixed;
     right: 0;
-    bottom: 0;
+    top: 0;
+    width: 25vw;
+    height: 100vh;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+}
+
+/* Bouton invisible en haut */
+.invisible-btn-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 25vh;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+}
+
+/* Bouton invisible à gauche */
+.invisible-btn-left {
+    position: fixed;
+    left: 0;
+    top: 0;
     width: 25vw;
     height: 100vh;
     background: transparent;
@@ -21,7 +49,15 @@
     z-index: 10;
 }
 </style>
+
 <div class="laboratoire-bg">
-    <button class="invisible-btn" onclick="window.location.href='/terminal'" aria-label="Zone terminal"></button>
+    <!-- Droite -->
+    <button class="invisible-btn-right" onclick="window.location.href='/terminal'" aria-label="Zone terminal droite"></button>
+
+    <!-- Haut -->
+    <button class="invisible-btn-top" onclick="window.location.href='/final'" aria-label="Zone terminal haut"></button>
+
+    <!-- Gauche -->
+    <button class="invisible-btn-left" onclick="window.location.href='/terminal'" aria-label="Zone terminal gauche"></button>
 </div>
 {% endblock %}
