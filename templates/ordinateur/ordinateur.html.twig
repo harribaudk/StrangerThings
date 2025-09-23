@@ -1,5 +1,269 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+<div class="tictactoe-container">
+    <div id="tictactoe-title">TIC TAC TOE</div>
+    <div id="tictactoe-grid">
+        {% for i in 0..8 %}
+            <div class="tictactoe-cell" data-index="{{ i }}"></div>
+        {% endfor %}
+    </div>
+    <div id="tictactoe-message"></div>
+    <button id="tictactoe-reset" style="display:none;">Rejouer</button>
+    <div id="tictactoe-code" style="display:none;"></div>
+    <button id="tictactoe-close" style="position:absolute;top:20px;right:30px;background:transparent;border:none;cursor:pointer;font-size:2rem;color:#0f0;z-index:10;" title="Fermer">✖</button>
+</div>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+body {
+    background: #000;
+}
+.tictactoe-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    min-width: 100vw;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+}
+#tictactoe-title {
+    color: #0f0;
+    font-family: 'Press Start 2P', monospace, 'VT323', 'Courier New', Courier, monospace;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: 2px;
+    text-shadow: 0 0 8px #0f0, 0 0 2px #0f0;
+    text-align: center;
+    filter: contrast(1.2) brightness(1.1);
+}
+#tictactoe-grid {
+    display: grid;
+    grid-template-rows: repeat(3, 100px);
+    grid-template-columns: repeat(3, 100px);
+    gap: 0;
+    background: #111;
+    border: 6px solid #0f0;
+    box-shadow: 0 0 40px #0f0, 0 0 10px #0f0 inset;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+    width: 300px;
+    height: 300px;
+}
+.tictactoe-cell {
+    width: 100px;
+    height: 100px;
+    background: #111;
+    border: 2px solid #0f0;
+    border-radius: 0;
+    box-shadow: 0 0 2px #0f0 inset;
+    font-family: 'Press Start 2P', monospace, 'VT323', 'Courier New', Courier, monospace;
+    font-size: 2.5rem;
+    color: #0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.1s, color 0.1s, box-shadow 0.1s;
+    outline: none;
+}
+.tictactoe-cell:hover {
+    background: #222;
+    box-shadow: 0 0 10px #0f0, 0 0 2px #0f0 inset;
+}
+.tictactoe-cell.win {
+    background: #0f0;
+    color: #000;
+    box-shadow: 0 0 16px #0f0, 0 0 4px #0f0 inset;
+}
+#tictactoe-message {
+    color: #0f0;
+    font-family: 'Press Start 2P', monospace, 'VT323', 'Courier New', Courier, monospace;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 8px #0f0, 0 0 2px #0f0;
+    min-height: 2em;
+    text-align: center;
+}
+#tictactoe-reset {
+    background: #111;
+    color: #0f0;
+    border: 2px solid #0f0;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1rem;
+    padding: 0.5em 1.5em;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    box-shadow: 0 0 8px #0f0, 0 0 2px #0f0 inset;
+    transition: background 0.2s, color 0.2s;
+}
+#tictactoe-reset:hover {
+    background: #0f0;
+    color: #111;
+}
+#tictactoe-code {
+    color: #f00;
+    font-family: 'Press Start 2P', monospace, 'VT323', 'Courier New', Courier, monospace;
+    font-size: 1.5rem;
+    margin-top: 1rem;
+    text-shadow: 0 0 8px #f00, 0 0 2px #f00;
+    letter-spacing: 2px;
+    text-align: center;
+}
+.tictactoe-container::after {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(0,255,0,0.07) 0px,
+        rgba(0,255,0,0.07) 2px,
+        transparent 2px,
+        transparent 4px
+    );
+    z-index: 2;
+}
+</style>
+<script>
+// Tic Tac Toe Stranger Things - tout en un fichier
+const cells = [];
+let board = Array(9).fill(null);
+let playerTurn = true;
+let gameOver = false;
+const WIN_COMBOS = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+];
+function renderBoard() {
+    for (let i = 0; i < 9; i++) {
+        cells[i].textContent = board[i] || '';
+        cells[i].classList.remove('win');
+    }
+}
+function showMessage(msg) {
+    document.getElementById('tictactoe-message').textContent = msg;
+}
+function showCode() {
+    const codeDiv = document.getElementById('tictactoe-code');
+    codeDiv.style.display = 'block';
+    codeDiv.textContent = 'CODE : onze';
+}
+function checkWinner(bd, symbol) {
+    for (const combo of WIN_COMBOS) {
+        if (combo.every(idx => bd[idx] === symbol)) {
+            combo.forEach(idx => cells[idx].classList.add('win'));
+            return true;
+        }
+    }
+    return false;
+}
+function isDraw() {
+    return board.every(cell => cell);
+}
+function botMove() {
+    // IA simple : joue pour gagner, sinon bloque, sinon aléatoire
+    for (let i = 0; i < 9; i++) {
+        if (!board[i]) {
+            board[i] = 'O';
+            if (checkWinner(board, 'O')) {
+                renderBoard();
+                endGame('Le demogorgon s\'empare de vous !');
+                return;
+            }
+            board[i] = null;
+        }
+    }
+    for (let i = 0; i < 9; i++) {
+        if (!board[i]) {
+            board[i] = 'X';
+            if (checkWinner(board, 'X')) {
+                board[i] = 'O';
+                renderBoard();
+                playerTurn = true;
+                if (checkWinner(board, 'O')) {
+                    endGame('Le demogorgon s\'empare de vous !');
+                } else if (isDraw()) {
+                    endGame('Match nul !');
+                }
+                return;
+            }
+            board[i] = null;
+        }
+    }
+    const empty = board.map((v,i) => v ? null : i).filter(v => v !== null);
+    if (empty.length) {
+        const idx = empty[Math.floor(Math.random() * empty.length)];
+        board[idx] = 'O';
+        renderBoard();
+        if (checkWinner(board, 'O')) {
+            endGame('Le demogorgon s\'empare de vous !');
+        } else if (isDraw()) {
+            endGame('Match nul !');
+        } else {
+            playerTurn = true;
+        }
+    }
+}
+function endGame(msg) {
+    gameOver = true;
+    showMessage(msg);
+    document.getElementById('tictactoe-reset').style.display = 'inline-block';
+    if (msg.includes('gagné') && msg.includes('Vous')) {
+        showCode();
+    }
+}
+function handleCellClick(e) {
+    if (!playerTurn || gameOver) return;
+    const idx = parseInt(e.target.dataset.index);
+    if (board[idx]) return;
+    board[idx] = 'X';
+    renderBoard();
+    if (checkWinner(board, 'X')) {
+        endGame('Vous avez gagné !');
+        return;
+    }
+    if (isDraw()) {
+        endGame('Match nul !');
+        return;
+    }
+    playerTurn = false;
+    setTimeout(botMove, 500);
+}
+function resetGame() {
+    board = Array(9).fill(null);
+    playerTurn = true;
+    gameOver = false;
+    renderBoard();
+    showMessage('À vous de jouer !');
+    document.getElementById('tictactoe-reset').style.display = 'none';
+    document.getElementById('tictactoe-code').style.display = 'none';
+}
+document.addEventListener('DOMContentLoaded', () => {
+    const grid = document.getElementById('tictactoe-grid');
+    for (let i = 0; i < 9; i++) {
+        cells[i] = grid.children[i];
+        cells[i].addEventListener('click', handleCellClick);
+    }
+    document.getElementById('tictactoe-reset').addEventListener('click', resetGame);
+    document.getElementById('tictactoe-close').addEventListener('click', function() {
+        window.location.href = '/laboratoire';
+    });
+    resetGame();
+});
+</script>
+{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
 {% endblock %}
