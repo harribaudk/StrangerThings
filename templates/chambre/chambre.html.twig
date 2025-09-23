@@ -25,10 +25,19 @@ html, body {
 
 .lampe { top: 100px; left: 200px; width: 50px; }
 .livre { top: 649px; left: 600px; width: 120px; transform: translate(-50%, -50%); }
-.tableau { top: 304px; left: 889px; width: 148px; height: 90px;
-           background-color: rgba(255,255,0,0.2); box-shadow: 0 0 20px 5px yellow;
-           border: 2px solid gold; border-radius: 8px;
-           animation: pulse 2s infinite alternate; }
+.tableau {
+    position: absolute;
+    top: 39.1%;   /* 304 / 1080 * 100 */
+    left: 64.3%;  /* 889 / 1920 * 100 */
+    width: 11.1%;  /* 148 / 1920 * 100 */
+    height: 11.8%; 
+    background-color: rgba(255,255,0,0.2);
+    box-shadow: 0 0 20px 5px yellow;
+    border: 2px solid gold;
+    border-radius: 8px;
+    animation: pulse 2s infinite alternate;
+}
+
 
 @keyframes pulse {
     0% { box-shadow: 0 0 10px 2px yellow; }
@@ -126,7 +135,7 @@ html, body {
         Vous êtes dans la chambre de Will...<br><br>
         Les murs tremblent, les lumières clignotent.<br>
         Quelque chose cherche à communiquer à travers ce tableau.<br><br>
-        Cliquez sur la peluche pour continuer...
+       
     </p>
     <img src="/images/des.png" alt="Commencer" class="peluche-start" style="width:50px; height:auto;">
 
@@ -234,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function(){
                     clearInterval(interval);
                 }
             }, 800);
-        },4000);
+        },3000);
     });
 
     // Validation mot
