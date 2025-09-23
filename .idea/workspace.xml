@@ -5,20 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d84c638a-ba55-492e-86ac-1595f8a66991" name="Changes" comment="Front Inverse">
-      <change afterPath="$PROJECT_DIR$/.idea/commandlinetools/Symfony_22_09_2025_14_23.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/commandlinetools/schemas/frameworkDescriptionVersion1.1.4.xsd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask2agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.edit.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_22_09_2025_14_22_[Changes]/shelved.patch" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_22_09_2025_14_22_[Changes]1/shelved.patch" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_22_09_2025_14_22__Changes_.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/laboratoire/laboratoire.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/laboratoire/laboratoire.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/terminal/terminal.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/terminal/terminal.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/ordinateur/ordinateur.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/ordinateur/ordinateur.html.twig" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -226,6 +214,8 @@
       <workItem from="1758548617905" duration="140000" />
       <workItem from="1758548782115" duration="1003000" />
       <workItem from="1758611137919" duration="6341000" />
+      <workItem from="1758620981462" duration="1309000" />
+      <workItem from="1758625638291" duration="4282000" />
     </task>
     <task id="LOCAL-00001" summary="Front Inverse">
       <option name="closed" value="true" />
