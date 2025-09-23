@@ -93,9 +93,7 @@ class PageController extends AbstractController {
         }
         $session->invalidate();
 
-        return $this->render('fete/fete.html.twig', [
-            'message' => 'Bienvenue dans le Monde à l’Envers ! 👽'
-        ]);
+        return $this->render('fete/fete.html.twig');
     }
 
     #[Route('/terminal', name: 'terminal_page')]
@@ -103,6 +101,12 @@ class PageController extends AbstractController {
     {
 
         return $this->render('terminal/terminal.html.twig');
+    }
+
+    #[Route('/laboratoire', name: 'app_laboratoire', methods: ['GET'])]
+    public function laboratoire(): Response
+    {
+        return $this->render('laboratoire/laboratoire.html.twig');
     }
 
 
